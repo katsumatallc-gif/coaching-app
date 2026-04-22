@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="指導者管理">
+<title>指導者 出欠・配置管理</title>
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
+:root {
+  --bg:#f0f4f8;--white:#fff;--blue:#2563eb;--blue-l:#dbeafe;
+  --green:#16a34a;--green-l:#dcfce7;--red:#dc2626;--red-l:#fee2e2;
+  --gray:#64748b;--gray-l:#e2e8f0;--text:#1e293b;--sub:#64748b;
+  --shadow:0 2px 12px rgba(0,0,0,.08);--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'M PLUS Rounded 1c',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.tab-bar{background:#fff;display:flex;border-bottom:2px solid var(--gray-l);position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
+.tab-btn{flex:1;padding:12px 4px 10px;border:none;background:transparent;font-family:inherit;font-size:11px;font-weight:700;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.tab-btn .icon{font-size:20px;display:block;margin-bottom:2px;}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.page{display:none;padding:14px;padding-bottom:48px;}
+.page.active{display:block;}
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--gray-l);display:flex;align-items:center;gap:8px;}
+.card-title{font-size:14px;font-weight:800;}
+.card-body{padding:14px 16px;}
+.nav-btn{width:38px;height:38px;border-radius:50%;border:2px solid var(--gray-l);background:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-btn:hover{border-color:var(--blue);color:var(--blue);}
+input[type=date],input[type=text]{font-family:inherit;font-size:14px;border:2px solid var(--gray-l);border-radius:10px;padding:8px 12px;background:#fff;color:var(--text);outline:none;}
+input[type=date]:focus,input[type=text]:focus{border-color:var(--blue);}
+input[type=date]{color-scheme:light;}
+.lbl{font-size:13px;font-weight:800;color:var(--sub);margin-bottom:8px;}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.name-btn{padding:14px 8px;border-radius:12px;border:2px solid var(--gray-l);background:#fff;font-family:inherit;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
+.name-btn.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue);}
+.att-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.att-btn{padding:18px 8px;border-radius:14px;border:3px solid var(--gray-l);background:#fff;font-family:inherit;font-size:30px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.att-btn span{font-size:13px;font-weight:700;}
+.att-btn.present.sel{border-color:var(--green);background:var(--green-l);color:var(--green);}
+.att-btn.absent.sel{border-color:var(--red);background:var(--red-l);color:var(--red);}
+.submit{width:100%;padding:15px;border-radius:14px;border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+.submit:active{transform:scale(.98);}
+.pill{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:13px;font-weight:800;}
+.pill.present{background:var(--green-l);color:var(--green);}
+.pill.absent{background:var(--red-l);color:var(--red);}
+.pill.unknown{background:var(--gray-l);color:var(--gray);}
+.date-hdr{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:12px;padding:14px 16px;display:flex;align-items:center;}
+.date-center{flex:1;text-align:center;}
+.date-big{font-size:26px;font-weight:800;}
+.date-sub{font-size:12px;color:var(--sub);margin-top:2px;}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:4px;}
+.badge-sat{background:#dbeafe;color:#1d4ed8;}
+.badge-sun{background:#fee2e2;color:#b91c1c;}
+.badge-hol{background:#fce7f3;color:#9d174d;}
+.att-tbl{width:100%;border-collapse:collapse;}
+.att-tbl th{padding:8px 10px;background:var(--bg);font-size:12px;color:var(--sub);font-weight:700;text-align:left;border-bottom:2px solid var(--gray-l);}
+.att-tbl td{padding:11px 10px;border-bottom:1px solid var(--gray-l);font-size:14px;vertical-align:middle;}
+.att-tbl tr:last-child td{border-bottom:none;}
+.pool{background:var(--bg);border-radius:12px;padding:12px;}
+.pool-lbl{font-size:12px;font-weight:800;color:var(--sub);margin-bottom:8px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;min-height:36px;}
+.zone-area{border-radius:12px;overflow:hidden;border:2px solid;}
+.zone-hdr{padding:10px 14px;display:flex;align-items:center;gap:8px;}
+.zone-body{padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;min-height:52px;align-content:flex-start;}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer;user-select:none;}
+.chip:active{transform:scale(.94);}
+.chip-un{background:#fff;border:2px solid var(--gray-l);color:var(--text);box-shadow:var(--shadow);}
+.zc-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--gray-l);background:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
+.zc-btn.act{border-color:var(--blue);background:var(--blue-l);color:var(--blue);}
+.zdot{width:12px;height:12px;border-radius:50%;flex-shrink:0;display:inline-block;}
+.ov-wrap{overflow-x:auto;}
+.ov-tbl{border-collapse:collapse;width:100%;}
+.ov-tbl th,.ov-tbl td{padding:8px 10px;text-align:center;font-size:13px;border:1px solid var(--gray-l);}
+.ov-tbl th{background:var(--blue-l);color:var(--blue);font-weight:800;}
+.ov-tbl th:first-child{background:var(--bg);color:var(--sub);text-align:left;min-width:56px;}
+.ov-tbl td:first-child{font-weight:700;text-align:left;background:var(--bg);}
+.ov-zone{font-size:10px;font-weight:700;padding:1px 5px;border-radius:5px;display:inline-block;margin-top:2px;}
+.coach-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.coach-row input{flex:1;}
+.del-btn{width:34px;height:34px;border-radius:9px;border:2px solid var(--gray-l);background:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.del-btn:hover{border-color:var(--red);color:var(--red);}
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:11px 22px;border-radius:28px;font-size:14px;font-weight:700;pointer-events:none;white-space:nowrap;z-index:999;opacity:0;transition:opacity .3s;}
+.toast.show{opacity:1;}
+.menu-overlay{position:fixed;inset:0;z-index:400;}
+.menu{position:fixed;z-index:500;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:10px;min-width:168px;}
+.menu-title{font-size:12px;color:var(--sub);font-weight:700;padding:0 4px 6px;border-bottom:1px solid var(--gray-l);margin-bottom:4px;}
+.menu-item{padding:10px 12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.menu-item:hover{background:var(--bg);}
+.sync-bar{display:flex;align-items:center;gap:6px;padding:6px 14px;background:#f8fafc;border-top:1px solid var(--gray-l);font-size:11px;color:var(--sub);}
+.sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.zone-edit-box{background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('entry')"><span class="icon">✏️</span>出欠入力</button>
+  <button class="tab-btn" onclick="showTab('day')"><span class="icon">📋</span>日別確認</button>
+  <button class="tab-btn" onclick="showTab('overview')"><span class="icon">📅</span>一覧</button>
+  <button class="tab-btn" onclick="showTab('settings')"><span class="icon">⚙️</span>設定</button>
+</div>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot" style="background:#94a3b8"></div>
+  <span id="syncLabel">接続中…</span>
+  <button onclick="forceSync()" style="margin-left:auto;border:none;background:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔄 更新</button>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="menuOverlay" class="menu-overlay" style="display:none" onclick="closeMenu()"></div>
+<div id="menu" class="menu" style="display:none"></div>
+
+<!-- ENTRY -->
+<div id="page-entry" class="page active">
+  <div class="card">
+    <div class="card-hdr"><span>✏️</span><div class="card-title">出欠を自己申告</div></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <span class="lbl" style="margin-bottom:0">日付</span>
+        <input type="date" id="entryDate">
+      </div>
+      <div class="lbl">あなたの名前</div>
+      <div class="name-grid" id="nameGrid"></div>
+      <div class="lbl">出欠</div>
+      <div class="att-grid">
+        <button class="att-btn present" id="btnPresent" onclick="selectAtt('present')">○<span>出席</span></button>
+        <button class="att-btn absent"  id="btnAbsent"  onclick="selectAtt('absent')">×<span>欠席</span></button>
+      </div>
+      <button class="submit" onclick="submitEntry()">登録する</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAY -->
+<div id="page-day" class="page">
+  <div class="date-hdr">
+    <button class="nav-btn" onclick="shiftDay(-1)">‹</button>
+    <div class="date-center">
+      <div class="date-big" id="dayDateBig"></div>
+      <div class="date-sub" id="dayDateSub"></div>
+      <div id="dayBadge"></div>
+    </div>
+    <button class="nav-btn" onclick="shiftDay(1)">›</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>👥</span><div class="card-title">出欠状況</div></div>
+    <div class="card-body" style="padding:0">
+      <table class="att-tbl" id="dayAttTbl"></table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <span>📍</span><div class="card-title">配置先の振り分け</div>
+      <button onclick="toggleZoneEdit()" style="margin-left:auto;border:2px solid var(--gray-l);background:#fff;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✏️ エリア編集</button>
+    </div>
+    <div class="card-body">
+      <div id="zoneEditBox" style="display:none"></div>
+      <div style="font-size:12px;color:var(--sub);background:var(--bg);border-radius:8px;padding:8px 12px;margin-bottom:12px">👇 名前をタップして配置先を選択</div>
+      <div id="placementBoard" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+  <div style="text-align:center">
+    <button class="submit" style="width:auto;padding:12px 28px;font-size:14px" onclick="exportDay()">📋 この日をコピー</button>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="page-overview" class="page">
+  <div class="card">
+    <div class="card-hdr">
+      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(-1)">‹</button>
+      <div class="card-title" style="flex:1;text-align:center;font-size:16px" id="ovMonthLabel"></div>
+      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(1)">›</button>
+    </div>
+    <div class="card-body" style="padding:0 0 4px">
+      <div class="ov-wrap"><table class="ov-tbl" id="ovTbl"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="card-hdr"><span>👥</span><div class="card-title">指導者メンバー</div></div>
+    <div class="card-body">
+      <div id="coachList"></div>
+      <button onclick="addCoach()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:2px dashed var(--blue);background:var(--blue-l);color:var(--blue);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">＋ 追加</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>📍</span><div class="card-title">デフォルトエリア設定</div></div>
+    <div class="card-body">
+      <div class="lbl">エリア数</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px" id="zcBtns">
+        <button class="zc-btn" onclick="setZoneCount(1)">1</button>
+        <button class="zc-btn" onclick="setZoneCount(2)">2</button>
+        <button class="zc-btn" onclick="setZoneCount(3)">3</button>
+      </div>
+      <div id="zoneNamesGrid"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>ℹ️</span><div class="card-title">共有について</div></div>
+    <div class="card-body" style="font-size:13px;color:var(--sub);line-height:1.7">
+      <p>このアプリは<strong style="color:var(--text)">全員が同じデータ</strong>をリアルタイムで共有しています。</p>
+      <p style="margin-top:8px">このページのURLをLINEで送れば、受け取った人もすぐに使えます。</p>
+      <p style="margin-top:8px">iPhoneは Safari で開いて「ホーム画面に追加」でアプリアイコンになります。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCeGiwM_T9CLw9IdWOVVUb_aNlp_x76zV4",
+  authDomain: "baseball-coaching-cb2a2.firebaseapp.com",
+  databaseURL: "https://baseball-coaching-cb2a2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "baseball-coaching-cb2a2",
+  storageBucket: "baseball-coaching-cb2a2.firebasestorage.app",
+  messagingSenderId: "972019712430",
+  appId: "1:972019712430:web:4e4ea9e4bd8b644309483f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const dbRef = ref(db, "coachingApp");
+
+// ── 定数 ──────────────────────────────────────────
+const HOLIDAYS = new Set([
+  "2025-01-01","2025-01-13","2025-02-11","2025-02-23","2025-02-24",
+  "2025-03-20","2025-04-29","2025-05-03","2025-05-04","2025-05-05","2025-05-06",
+  "2025-07-21","2025-08-11","2025-09-15","2025-09-22","2025-09-23",
+  "2025-10-13","2025-11-03","2025-11-23","2025-11-24",
+  "2026-01-01","2026-01-12","2026-02-11","2026-02-23","2026-03-20",
+  "2026-04-29","2026-05-03","2026-05-04","2026-05-05","2026-05-06",
+  "2026-07-20","2026-08-11","2026-09-21","2026-09-22","2026-09-23",
+  "2026-10-12","2026-11-03","2026-11-23",
+]);
+const DOW = ["日","月","火","水","木","金","土"];
+const ZC = [
+  {bg:"#fef3c7",border:"#f59e0b",text:"#92400e",dot:"#f59e0b"},
+  {bg:"#ede9fe",border:"#8b5cf6",text:"#5b21b6",dot:"#8b5cf6"},
+  {bg:"#e0f2fe",border:"#0ea5e9",text:"#0369a1",dot:"#0ea5e9"},
+];
+
+function isWH(d){const w=new Date(d).getDay();return w===0||w===6||HOLIDAYS.has(d);}
+function nextWH(d,dir){const dt=new Date(d);for(let i=0;i<400;i++){dt.setDate(dt.getDate()+dir);const s=dt.toISOString().split("T")[0];if(isWH(s))return s;}return d;}
+function nearestWH(d){return isWH(d)?d:nextWH(d,1);}
+function today(){return new Date().toISOString().split("T")[0];}
+function getMonthWH(y,m){const days=new Date(y,m,0).getDate(),res=[];for(let d=1;d<=days;d++){const s=`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;if(isWH(s))res.push(s);}return res;}
+
+// ── 状態 ──────────────────────────────────────────
+let state = {
+  coaches:["紅林","河村","杉本","勝又"],
+  zoneCount:2,
+  zoneNames:["上一色","翔洋","Cエリア"],
+  records:{}
+};
+
+let selName=null, selAtt=null;
+let dayDate=nearestWH(today());
+let zoneEditOpen=false;
+let ovYear=new Date().getFullYear(), ovMonth=new Date().getMonth()+1;
+let currentTab="entry";
+let isSaving=false;
+
+function getDZC(d){return state.records[d]?._zoneCount??state.zoneCount;}
+function getDZN(d){return state.records[d]?._zones??[...state.zoneNames];}
+function ensureRec(d){if(!state.records[d])state.records[d]={};}
+
+// ── Firebase 同期 ─────────────────────────────────
+function setSyncStatus(status){
+  const dot=document.getElementById("syncDot");
+  const lbl=document.getElementById("syncLabel");
+  if(status==="ok"){dot.style.background="#16a34a";lbl.textContent="同期済み";}
+  else if(status==="saving"){dot.style.background="#f59e0b";lbl.textContent="保存中…";}
+  else{dot.style.background="#94a3b8";lbl.textContent="接続中…";}
+}
+
+async function saveToFirebase(){
+  isSaving=true;setSyncStatus("saving");
+  try{
+    await set(dbRef, JSON.parse(JSON.stringify(state)));
+    setSyncStatus("ok");
+  }catch(e){showToast("保存エラー。再試行してください");}
+  isSaving=false;
+}
+
+function forceSync(){
+  setSyncStatus("connecting");
+  get(dbRef).then(snap=>{
+    if(snap.exists()){state=snap.val();if(!state.records)state.records={};}
+    setSyncStatus("ok");renderCurrentTab();
+  }).catch(()=>showToast("同期エラー"));
+}
+
+// リアルタイム監視
+onValue(dbRef, (snap)=>{
+  if(isSaving)return;
+  if(snap.exists()){
+    const d=snap.val();
+    if(d){state=d;if(!state.records)state.records={};}
+  }
+  setSyncStatus("ok");
+  renderCurrentTab();
+});
+
+// ── タブ ─────────────────────────────────────────
+window.showTab = function(id){
+  currentTab=id;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  ["entry","day","overview","settings"].forEach((t,i)=>{
+    if(t===id)document.querySelectorAll(".tab-btn")[i].classList.add("active");
+  });
+  renderCurrentTab();
+};
+
+function renderCurrentTab(){
+  if(currentTab==="entry")renderEntry();
+  else if(currentTab==="day")renderDay();
+  else if(currentTab==="overview")renderOverview();
+  else if(currentTab==="settings")renderSettings();
+}
+
+// ── 出欠入力 ─────────────────────────────────────
+function renderEntry(){
+  const g=document.getElementById("nameGrid");g.innerHTML="";
+  state.coaches.forEach(n=>{
+    const b=document.createElement("button");
+    b.className="name-btn"+(selName===n?" sel":"");
+    b.textContent=n;b.onclick=()=>{selName=n;renderEntry();};
+    g.appendChild(b);
+  });
+  document.getElementById("btnPresent").className="att-btn present"+(selAtt==="present"?" sel":"");
+  document.getElementById("btnAbsent").className="att-btn absent"+(selAtt==="absent"?" sel":"");
+}
+
+window.selectAtt = function(a){selAtt=a;renderEntry();}
+
+window.submitEntry = async function(){
+  const date=document.getElementById("entryDate").value;
+  if(!date)return showToast("日付を選んでください");
+  if(!selName)return showToast("名前を選んでください");
+  if(!selAtt)return showToast("出欠を選んでください");
+  ensureRec(date);
+  const ex=state.records[date][selName]||{};
+  state.records[date][selName]={att:selAtt,zone:selAtt==="absent"?0:(ex.zone||0)};
+  await saveToFirebase();
+  showToast(selName+" の出欠を登録しました");
+  selAtt=null;renderEntry();
+};
+
+// ── 日別確認 ─────────────────────────────────────
+window.shiftDay = function(dir){dayDate=nextWH(dayDate,dir);zoneEditOpen=false;renderDay();}
+window.toggleZoneEdit = function(){zoneEditOpen=!zoneEditOpen;renderDay();}
+
+window.setDayZoneCount = async function(n){
+  ensureRec(dayDate);state.records[dayDate]._zoneCount=n;
+  state.coaches.forEach(name=>{if((state.records[dayDate][name]?.zone||0)>n)state.records[dayDate][name].zone=0;});
+  await saveToFirebase();renderDay();
+};
+
+function renderDay(){
+  const dt=new Date(dayDate);const dow=dt.getDay();
+  const[y,m,d]=dayDate.split("-");
+  document.getElementById("dayDateBig").textContent=parseInt(m)+"月"+parseInt(d)+"日";
+  document.getElementById("dayDateSub").textContent=y+"年（"+DOW[dow]+"）";
+  const badge=document.getElementById("dayBadge");
+  if(HOLIDAYS.has(dayDate))badge.innerHTML='<span class="badge badge-hol">🎌 祝日</span>';
+  else if(dow===0)badge.innerHTML='<span class="badge badge-sun">日曜日</span>';
+  else badge.innerHTML='<span class="badge badge-sat">土曜日</span>';
+
+  const rec=state.records[dayDate]||{};
+  const zCount=getDZC(dayDate);const zNames=getDZN(dayDate);
+
+  // エリア編集
+  const zeb=document.getElementById("zoneEditBox");
+  zeb.style.display=zoneEditOpen?"block":"none";
+  if(zoneEditOpen){
+    let h=`<div class="zone-edit-box"><div class="lbl">この日のエリア設定</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <span style="font-size:12px;font-weight:700;color:var(--sub)">エリア数：</span>
+      ${[1,2,3].map(n=>`<button class="zc-btn${zCount===n?" act":""}" onclick="setDayZoneCount(${n})">${n}</button>`).join("")}
+    </div>`;
+    for(let i=0;i<zCount;i++){
+      h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="zdot" style="background:${ZC[i].dot}"></span>
+        <input type="text" value="${zNames[i]||'エリア'+(i+1)}" style="flex:1" onchange="setDayZoneName(${i},this.value)">
+      </div>`;
+    }
+    h+="</div>";zeb.innerHTML=h;
+  }
+
+  // 出欠テーブル
+  let html="<thead><tr><th>指導者</th><th>出欠</th></tr></thead><tbody>";
+  state.coaches.forEach(name=>{
+    const r=rec[name]||{att:"unknown"};
+    const pill=r.att==="present"?'present">○ 出席':r.att==="absent"?'absent">× 欠席':'unknown">？ 未入力';
+    html+=`<tr><td style="font-weight:700">${name}</td><td><span class="pill ${pill}</span></td></tr>`;
+  });
+  document.getElementById("dayAttTbl").innerHTML=html+"</tbody>";
+
+  // 配置ボード
+  const board=document.getElementById("placementBoard");board.innerHTML="";
+  const present=state.coaches.filter(n=>rec[n]?.att==="present");
+  if(!present.length){board.innerHTML='<div style="color:var(--gray);font-size:13px;text-align:center;padding:16px">出席者がいません</div>';return;}
+
+  const ua=present.filter(n=>!rec[n]?.zone);
+  const pool=document.createElement("div");pool.className="pool";
+  pool.innerHTML=`<div class="pool-lbl">📥 配置未定（${ua.length}名）</div>`;
+  const poolChips=document.createElement("div");poolChips.className="chips";
+  if(!ua.length)poolChips.innerHTML='<span style="font-size:13px;color:var(--gray)">全員配置済み ✅</span>';
+  else ua.forEach(n=>poolChips.appendChild(makeChip(n,0,zCount,zNames)));
+  pool.appendChild(poolChips);board.appendChild(pool);
+
+  for(let z=1;z<=zCount;z++){
+    const c=ZC[z-1];const assigned=present.filter(n=>rec[n]?.zone===z);
+    const area=document.createElement("div");area.className="zone-area";
+    area.style.cssText=`background:${c.bg};border-color:${c.border}`;
+    area.innerHTML=`<div class="zone-hdr" style="background:${c.bg}">
+      <span class="zdot" style="background:${c.dot}"></span>
+      <span style="font-size:15px;font-weight:800;flex:1;color:${c.text}">${zNames[z-1]||"エリア"+z}</span>
+      <span style="font-size:12px;color:${c.text};opacity:.7">${assigned.length}名</span>
+    </div>`;
+    const body=document.createElement("div");body.className="zone-body";
+    if(!assigned.length)body.innerHTML=`<span style="color:${c.text};font-size:13px;opacity:.5">ここに配置</span>`;
+    else assigned.forEach(n=>body.appendChild(makeChip(n,z,zCount,zNames)));
+    area.appendChild(body);board.appendChild(area);
+  }
+}
+
+window.setDayZoneName = async function(i,val){
+  ensureRec(dayDate);const z=getDZN(dayDate);z[i]=val;
+  state.records[dayDate]._zones=z;await saveToFirebase();
+};
+
+function makeChip(name,cz,zCount,zNames){
+  const chip=document.createElement("div");
+  chip.className="chip"+(cz===0?" chip-un":"");
+  if(cz>0){const c=ZC[cz-1];chip.style.cssText=`background:${c.bg};border:2px solid ${c.border};color:${c.text}`;}
+  const txt=document.createElement("span");txt.textContent=name;chip.appendChild(txt);
+  if(cz>0){const x=document.createElement("span");x.textContent="✕";x.style.cssText="font-size:11px;opacity:.45;margin-left:2px";chip.appendChild(x);}
+  chip.onclick=e=>{e.stopPropagation();showChipMenu(e,name,cz,zCount,zNames);};
+  return chip;
+}
+
+function showChipMenu(e,name,cz,zCount,zNames){
+  const menu=document.getElementById("menu");
+  const rect=e.currentTarget.getBoundingClientRect();
+  let top=rect.bottom+6,left=rect.left;
+  if(top+220>window.innerHeight)top=rect.top-220;
+  if(left+175>window.innerWidth)left=window.innerWidth-180;
+  menu.style.cssText=`display:block;top:${top}px;left:${left}px`;
+  document.getElementById("menuOverlay").style.display="block";
+  let h=`<div class="menu-title">${name} の配置先</div>`;
+  if(cz>0)h+=`<div class="menu-item" style="color:var(--gray)" onclick="assignZone('${name}',0)">📥 未定に戻す</div>`;
+  for(let z=1;z<=zCount;z++){
+    const c=ZC[z-1];const active=cz===z;
+    h+=`<div class="menu-item" style="background:${active?c.bg:"transparent"};color:${c.text}" onclick="assignZone('${name}',${z})">
+      <span class="zdot" style="background:${c.dot}"></span>${zNames[z-1]||"エリア"+z}${active?" ✓":""}
+    </div>`;
+  }
+  menu.innerHTML=h;
+}
+
+window.assignZone = async function(name,z){
+  ensureRec(dayDate);
+  if(!state.records[dayDate][name])state.records[dayDate][name]={att:"present",zone:0};
+  state.records[dayDate][name].zone=z;
+  await saveToFirebase();closeMenu();renderDay();
+};
+
+window.closeMenu = function(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("menuOverlay").style.display="none";
+};
+
+window.exportDay = function(){
+  const rec=state.records[dayDate]||{};const zCount=getDZC(dayDate);const zNames=getDZN(dayDate);
+  const[y,m,d]=dayDate.split("-");const dow=DOW[new Date(dayDate).getDay()];
+  let txt=`【${parseInt(m)}/${parseInt(d)}（${dow}） 出欠・配置】\n\n`;
+  for(let z=1;z<=zCount;z++){
+    const a=state.coaches.filter(n=>rec[n]?.att==="present"&&rec[n]?.zone===z);
+    txt+=`▼ ${zNames[z-1]||"エリア"+z}（${a.length}名）\n`;a.forEach(n=>txt+=`  ・${n}\n`);txt+="\n";
+  }
+  const ua=state.coaches.filter(n=>rec[n]?.att==="present"&&!rec[n]?.zone);
+  if(ua.length){txt+=`▼ 配置未定（${ua.length}名）\n`;ua.forEach(n=>txt+=`  ・${n}\n`);txt+="\n";}
+  const ab=state.coaches.filter(n=>rec[n]?.att==="absent");
+  if(ab.length){txt+=`▼ 欠席（${ab.length}名）\n`;ab.forEach(n=>txt+=`  ・${n}\n`);}
+  navigator.clipboard.writeText(txt).then(()=>showToast("コピーしました！")).catch(()=>prompt("コピー:",txt));
+};
+
+// ── 一覧 ─────────────────────────────────────────
+window.shiftMonth = function(dir){
+  ovMonth+=dir;
+  if(ovMonth>12){ovMonth=1;ovYear++;}
+  if(ovMonth<1){ovMonth=12;ovYear--;}
+  renderOverview();
+};
+
+function renderOverview(){
+  document.getElementById("ovMonthLabel").textContent=ovYear+"年"+ovMonth+"月";
+  const dates=getMonthWH(ovYear,ovMonth);
+  const tbl=document.getElementById("ovTbl");
+  let html="<thead><tr><th>指導者</th>";
+  dates.forEach(d=>{
+    const dow=new Date(d).getDay();const dy=parseInt(d.split("-")[2]);
+    const isHol=HOLIDAYS.has(d);
+    const col=isHol?"#9d174d":dow===0?"#b91c1c":"#1d4ed8";
+    html+=`<th style="color:${col}">${dy}日<br><span style="font-size:10px;font-weight:500">${DOW[dow]}</span></th>`;
+  });
+  html+="</tr></thead><tbody>";
+  state.coaches.forEach(name=>{
+    html+=`<tr><td>${name}</td>`;
+    dates.forEach(d=>{
+      const rec=state.records[d]||{};const zNames=getDZN(d);const r=rec[name];
+      if(!r){html+='<td style="color:#cbd5e1;font-size:13px">－</td>';return;}
+      const att=r.att==="present"?"○":r.att==="absent"?"×":"－";
+      const col=r.att==="present"?"var(--green)":r.att==="absent"?"var(--red)":"var(--gray)";
+      const zc=r.att==="present"&&r.zone>0?ZC[r.zone-1]:null;
+      html+=`<td><span style="font-size:15px;color:${col};font-weight:800">${att}</span>`;
+      if(zc)html+=`<br><span class="ov-zone" style="background:${zc.bg};color:${zc.text}">${zNames[r.zone-1]||"E"+r.zone}</span>`;
+      html+="</td>";
+    });
+    html+="</tr>";
+  });
+  tbl.innerHTML=html+"</tbody>";
+}
+
+// ── 設定 ─────────────────────────────────────────
+function renderSettings(){
+  const list=document.getElementById("coachList");list.innerHTML="";
+  state.coaches.forEach((name,i)=>{
+    const row=document.createElement("div");row.className="coach-row";
+    const inp=document.createElement("input");inp.type="text";inp.value=name;
+    inp.onchange=async e=>{state.coaches[i]=e.target.value;await saveToFirebase();};
+    const del=document.createElement("button");del.className="del-btn";del.textContent="✕";
+    del.onclick=async()=>{state.coaches.splice(i,1);await saveToFirebase();renderSettings();};
+    row.append(inp,del);list.appendChild(row);
+  });
+  document.querySelectorAll("#zcBtns .zc-btn").forEach((b,i)=>b.classList.toggle("act",i+1===state.zoneCount));
+  const grid=document.getElementById("zoneNamesGrid");grid.innerHTML="";
+  for(let i=0;i<state.zoneCount;i++){
+    const row=document.createElement("div");row.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
+    const dot=document.createElement("span");dot.className="zdot";dot.style.background=ZC[i].dot;
+    const inp=document.createElement("input");inp.type="text";inp.value=state.zoneNames[i]||"エリア"+(i+1);
+    inp.style.flex="1";inp.onchange=async e=>{state.zoneNames[i]=e.target.value;await saveToFirebase();};
+    row.append(dot,inp);grid.appendChild(row);
+  }
+}
+
+window.addCoach = async function(){state.coaches.push("新しい指導者");await saveToFirebase();renderSettings();};
+window.setZoneCount = async function(n){state.zoneCount=n;await saveToFirebase();renderSettings();};
+
+// ── トースト ─────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2200);
+}
+window.forceSync=forceSync;
+
+// ── 初期化 ────────────────────────────────────────
+document.getElementById("entryDate").value=nearestWH(today());
+dayDate=nearestWH(today());
+renderEntry();
+</script>
+</body>
+</html>
