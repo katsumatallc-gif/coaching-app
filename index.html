@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="指導者出欠">
-<title>指導者 出欠・配置管理</title></title>
+<title>指導者 出欠・配置管理</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
 :root {
@@ -97,16 +97,16 @@ input[type=date]{color-scheme:light;}
 <body>
 
 <div class="tab-bar">
-  <button class="tab-btn active" onclick="showTab('entry')"><span class="icon">âï¸</span>åºæ¬ å¥å</button>
-  <button class="tab-btn" onclick="showTab('day')"><span class="icon">ð</span>æ¥å¥ç¢ºèª</button>
-  <button class="tab-btn" onclick="showTab('overview')"><span class="icon">ð</span>ä¸è¦§</button>
-  <button class="tab-btn" onclick="showTab('settings')"><span class="icon">âï¸</span>è¨­å®</button>
+  <button class="tab-btn active" onclick="showTab('entry')"><span class="icon">✏️</span>出欠入力</button>
+  <button class="tab-btn" onclick="showTab('day')"><span class="icon">📋</span>日別確認</button>
+  <button class="tab-btn" onclick="showTab('overview')"><span class="icon">📅</span>一覧</button>
+  <button class="tab-btn" onclick="showTab('settings')"><span class="icon">⚙️</span>設定</button>
 </div>
 
 <div class="sync-bar">
   <div class="sync-dot" id="syncDot" style="background:#94a3b8"></div>
-  <span id="syncLabel">æ¥ç¶ä¸­â¦</span>
-  <button onclick="forceSync()" style="margin-left:auto;border:none;background:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">ð æ´æ°</button>
+  <span id="syncLabel">接続中…</span>
+  <button onclick="forceSync()" style="margin-left:auto;border:none;background:none;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔄 更新</button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -116,20 +116,20 @@ input[type=date]{color-scheme:light;}
 <!-- ENTRY -->
 <div id="page-entry" class="page active">
   <div class="card">
-    <div class="card-hdr"><span>âï¸</span><div class="card-title">åºæ¬ ãèªå·±ç³å</div></div>
+    <div class="card-hdr"><span>✏️</span><div class="card-title">出欠を自己申告</div></div>
     <div class="card-body">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-        <span class="lbl" style="margin-bottom:0">æ¥ä»</span>
+        <span class="lbl" style="margin-bottom:0">日付</span>
         <input type="date" id="entryDate">
       </div>
-      <div class="lbl">ããªãã®åå</div>
+      <div class="lbl">あなたの名前</div>
       <div class="name-grid" id="nameGrid"></div>
-      <div class="lbl">åºæ¬ </div>
+      <div class="lbl">出欠</div>
       <div class="att-grid">
-        <button class="att-btn present" id="btnPresent" onclick="selectAtt('present')">â<span>åºå¸­</span></button>
-        <button class="att-btn absent"  id="btnAbsent"  onclick="selectAtt('absent')">Ã<span>æ¬ å¸­</span></button>
+        <button class="att-btn present" id="btnPresent" onclick="selectAtt('present')">○<span>出席</span></button>
+        <button class="att-btn absent"  id="btnAbsent"  onclick="selectAtt('absent')">×<span>欠席</span></button>
       </div>
-      <button class="submit" onclick="submitEntry()">ç»é²ãã</button>
+      <button class="submit" onclick="submitEntry()">登録する</button>
     </div>
   </div>
 </div>
@@ -137,33 +137,33 @@ input[type=date]{color-scheme:light;}
 <!-- DAY -->
 <div id="page-day" class="page">
   <div class="date-hdr">
-    <button class="nav-btn" onclick="shiftDay(-1)">â¹</button>
+    <button class="nav-btn" onclick="shiftDay(-1)">‹</button>
     <div class="date-center">
       <div class="date-big" id="dayDateBig"></div>
       <div class="date-sub" id="dayDateSub"></div>
       <div id="dayBadge"></div>
     </div>
-    <button class="nav-btn" onclick="shiftDay(1)">âº</button>
+    <button class="nav-btn" onclick="shiftDay(1)">›</button>
   </div>
   <div class="card">
-    <div class="card-hdr"><span>ð¥</span><div class="card-title">åºæ¬ ç¶æ³</div></div>
+    <div class="card-hdr"><span>👥</span><div class="card-title">出欠状況</div></div>
     <div class="card-body" style="padding:0">
       <table class="att-tbl" id="dayAttTbl"></table>
     </div>
   </div>
   <div class="card">
     <div class="card-hdr">
-      <span>ð</span><div class="card-title">éç½®åã®æ¯ãåã</div>
-      <button onclick="toggleZoneEdit()" style="margin-left:auto;border:2px solid var(--gray-l);background:#fff;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">âï¸ ã¨ãªã¢ç·¨é</button>
+      <span>📍</span><div class="card-title">配置先の振り分け</div>
+      <button onclick="toggleZoneEdit()" style="margin-left:auto;border:2px solid var(--gray-l);background:#fff;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✏️ エリア編集</button>
     </div>
     <div class="card-body">
       <div id="zoneEditBox" style="display:none"></div>
-      <div style="font-size:12px;color:var(--sub);background:var(--bg);border-radius:8px;padding:8px 12px;margin-bottom:12px">ð ååãã¿ãããã¦éç½®åãé¸æ</div>
+      <div style="font-size:12px;color:var(--sub);background:var(--bg);border-radius:8px;padding:8px 12px;margin-bottom:12px">👇 名前をタップして配置先を選択</div>
       <div id="placementBoard" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
   <div style="text-align:center">
-    <button class="submit" style="width:auto;padding:12px 28px;font-size:14px" onclick="exportDay()">ð ãã®æ¥ãã³ãã¼</button>
+    <button class="submit" style="width:auto;padding:12px 28px;font-size:14px" onclick="exportDay()">📋 この日をコピー</button>
   </div>
 </div>
 
@@ -171,9 +171,9 @@ input[type=date]{color-scheme:light;}
 <div id="page-overview" class="page">
   <div class="card">
     <div class="card-hdr">
-      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(-1)">â¹</button>
+      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(-1)">‹</button>
       <div class="card-title" style="flex:1;text-align:center;font-size:16px" id="ovMonthLabel"></div>
-      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(1)">âº</button>
+      <button class="nav-btn" style="width:34px;height:34px;font-size:18px" onclick="shiftMonth(1)">›</button>
     </div>
     <div class="card-body" style="padding:0 0 4px">
       <div class="ov-wrap"><table class="ov-tbl" id="ovTbl"></table></div>
@@ -184,16 +184,16 @@ input[type=date]{color-scheme:light;}
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
   <div class="card">
-    <div class="card-hdr"><span>ð¥</span><div class="card-title">æå°èã¡ã³ãã¼</div></div>
+    <div class="card-hdr"><span>👥</span><div class="card-title">指導者メンバー</div></div>
     <div class="card-body">
       <div id="coachList"></div>
-      <button onclick="addCoach()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:2px dashed var(--blue);background:var(--blue-l);color:var(--blue);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">ï¼ è¿½å </button>
+      <button onclick="addCoach()" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:2px dashed var(--blue);background:var(--blue-l);color:var(--blue);font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">＋ 追加</button>
     </div>
   </div>
   <div class="card">
-    <div class="card-hdr"><span>ð</span><div class="card-title">ããã©ã«ãã¨ãªã¢è¨­å®</div></div>
+    <div class="card-hdr"><span>📍</span><div class="card-title">デフォルトエリア設定</div></div>
     <div class="card-body">
-      <div class="lbl">ã¨ãªã¢æ°</div>
+      <div class="lbl">エリア数</div>
       <div style="display:flex;gap:8px;margin-bottom:14px" id="zcBtns">
         <button class="zc-btn" onclick="setZoneCount(1)">1</button>
         <button class="zc-btn" onclick="setZoneCount(2)">2</button>
@@ -203,11 +203,11 @@ input[type=date]{color-scheme:light;}
     </div>
   </div>
   <div class="card">
-    <div class="card-hdr"><span>â¹ï¸</span><div class="card-title">å±æã«ã¤ãã¦</div></div>
+    <div class="card-hdr"><span>ℹ️</span><div class="card-title">共有について</div></div>
     <div class="card-body" style="font-size:13px;color:var(--sub);line-height:1.7">
-      <p>ãã®ã¢ããªã¯<strong style="color:var(--text)">å¨å¡ãåããã¼ã¿</strong>ããªã¢ã«ã¿ã¤ã ã§å±æãã¦ãã¾ãã</p>
-      <p style="margin-top:8px">ãã®ãã¼ã¸ã®URLãLINEã§éãã°ãåãåã£ãäººãããã«ä½¿ãã¾ãã</p>
-      <p style="margin-top:8px">iPhoneã¯ Safari ã§éãã¦ããã¼ã ç»é¢ã«è¿½å ãã§ã¢ããªã¢ã¤ã³ã³ã«ãªãã¾ãã</p>
+      <p>このアプリは<strong style="color:var(--text)">全員が同じデータ</strong>をリアルタイムで共有しています。</p>
+      <p style="margin-top:8px">このページのURLをLINEで送れば、受け取った人もすぐに使えます。</p>
+      <p style="margin-top:8px">iPhoneは Safari で開いて「ホーム画面に追加」でアプリアイコンになります。</p>
     </div>
   </div>
 </div>
@@ -231,7 +231,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 const dbRef = ref(db, "coachingApp");
 
-// ââ å®æ° ââââââââââââââââââââââââââââââââââââââââââ
+// ── 定数 ──────────────────────────────────────────
 const HOLIDAYS = new Set([
   "2025-01-01","2025-01-13","2025-02-11","2025-02-23","2025-02-24",
   "2025-03-20","2025-04-29","2025-05-03","2025-05-04","2025-05-05","2025-05-06",
@@ -242,7 +242,7 @@ const HOLIDAYS = new Set([
   "2026-07-20","2026-08-11","2026-09-21","2026-09-22","2026-09-23",
   "2026-10-12","2026-11-03","2026-11-23",
 ]);
-const DOW = ["æ¥","æ","ç«","æ°´","æ¨","é","å"];
+const DOW = ["日","月","火","水","木","金","土"];
 const ZC = [
   {bg:"#fef3c7",border:"#f59e0b",text:"#92400e",dot:"#f59e0b"},
   {bg:"#ede9fe",border:"#8b5cf6",text:"#5b21b6",dot:"#8b5cf6"},
@@ -255,11 +255,11 @@ function nearestWH(d){return isWH(d)?d:nextWH(d,1);}
 function today(){return new Date().toISOString().split("T")[0];}
 function getMonthWH(y,m){const days=new Date(y,m,0).getDate(),res=[];for(let d=1;d<=days;d++){const s=`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;if(isWH(s))res.push(s);}return res;}
 
-// ââ ç¶æ ââââââââââââââââââââââââââââââââââââââââââ
+// ── 状態 ──────────────────────────────────────────
 let state = {
-  coaches:["ç´æ","æ²³æ","ææ¬","åå"],
+  coaches:["紅林","河村","杉本","勝又"],
   zoneCount:2,
-  zoneNames:["ä¸ä¸è²","ç¿æ´","Cã¨ãªã¢"],
+  zoneNames:["上一色","翔洋","Cエリア"],
   records:{}
 };
 
@@ -274,13 +274,13 @@ function getDZC(d){return state.records[d]?._zoneCount??state.zoneCount;}
 function getDZN(d){return state.records[d]?._zones??[...state.zoneNames];}
 function ensureRec(d){if(!state.records[d])state.records[d]={};}
 
-// ââ Firebase åæ âââââââââââââââââââââââââââââââââ
+// ── Firebase 同期 ─────────────────────────────────
 function setSyncStatus(status){
   const dot=document.getElementById("syncDot");
   const lbl=document.getElementById("syncLabel");
-  if(status==="ok"){dot.style.background="#16a34a";lbl.textContent="åææ¸ã¿";}
-  else if(status==="saving"){dot.style.background="#f59e0b";lbl.textContent="ä¿å­ä¸­â¦";}
-  else{dot.style.background="#94a3b8";lbl.textContent="æ¥ç¶ä¸­â¦";}
+  if(status==="ok"){dot.style.background="#16a34a";lbl.textContent="同期済み";}
+  else if(status==="saving"){dot.style.background="#f59e0b";lbl.textContent="保存中…";}
+  else{dot.style.background="#94a3b8";lbl.textContent="接続中…";}
 }
 
 async function saveToFirebase(){
@@ -288,7 +288,7 @@ async function saveToFirebase(){
   try{
     await set(dbRef, JSON.parse(JSON.stringify(state)));
     setSyncStatus("ok");
-  }catch(e){showToast("ä¿å­ã¨ã©ã¼ãåè©¦è¡ãã¦ãã ãã");}
+  }catch(e){showToast("保存エラー。再試行してください");}
   isSaving=false;
 }
 
@@ -297,10 +297,10 @@ function forceSync(){
   get(dbRef).then(snap=>{
     if(snap.exists()){state=snap.val();if(!state.records)state.records={};}
     setSyncStatus("ok");renderCurrentTab();
-  }).catch(()=>showToast("åæã¨ã©ã¼"));
+  }).catch(()=>showToast("同期エラー"));
 }
 
-// ãªã¢ã«ã¿ã¤ã ç£è¦
+// リアルタイム監視
 onValue(dbRef, (snap)=>{
   if(isSaving)return;
   if(snap.exists()){
@@ -311,7 +311,7 @@ onValue(dbRef, (snap)=>{
   renderCurrentTab();
 });
 
-// ââ ã¿ã âââââââââââââââââââââââââââââââââââââââââ
+// ── タブ ─────────────────────────────────────────
 window.showTab = function(id){
   currentTab=id;
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -330,7 +330,7 @@ function renderCurrentTab(){
   else if(currentTab==="settings")renderSettings();
 }
 
-// ââ åºæ¬ å¥å âââââââââââââââââââââââââââââââââââââ
+// ── 出欠入力 ─────────────────────────────────────
 function renderEntry(){
   const g=document.getElementById("nameGrid");g.innerHTML="";
   state.coaches.forEach(n=>{
@@ -347,18 +347,18 @@ window.selectAtt = function(a){selAtt=a;renderEntry();}
 
 window.submitEntry = async function(){
   const date=document.getElementById("entryDate").value;
-  if(!date)return showToast("æ¥ä»ãé¸ãã§ãã ãã");
-  if(!selName)return showToast("ååãé¸ãã§ãã ãã");
-  if(!selAtt)return showToast("åºæ¬ ãé¸ãã§ãã ãã");
+  if(!date)return showToast("日付を選んでください");
+  if(!selName)return showToast("名前を選んでください");
+  if(!selAtt)return showToast("出欠を選んでください");
   ensureRec(date);
   const ex=state.records[date][selName]||{};
   state.records[date][selName]={att:selAtt,zone:selAtt==="absent"?0:(ex.zone||0)};
   await saveToFirebase();
-  showToast(selName+" ã®åºæ¬ ãç»é²ãã¾ãã");
+  showToast(selName+" の出欠を登録しました");
   selAtt=null;renderEntry();
 };
 
-// ââ æ¥å¥ç¢ºèª âââââââââââââââââââââââââââââââââââââ
+// ── 日別確認 ─────────────────────────────────────
 window.shiftDay = function(dir){dayDate=nextWH(dayDate,dir);zoneEditOpen=false;renderDay();}
 window.toggleZoneEdit = function(){zoneEditOpen=!zoneEditOpen;renderDay();}
 
@@ -371,53 +371,53 @@ window.setDayZoneCount = async function(n){
 function renderDay(){
   const dt=new Date(dayDate);const dow=dt.getDay();
   const[y,m,d]=dayDate.split("-");
-  document.getElementById("dayDateBig").textContent=parseInt(m)+"æ"+parseInt(d)+"æ¥";
-  document.getElementById("dayDateSub").textContent=y+"å¹´ï¼"+DOW[dow]+"ï¼";
+  document.getElementById("dayDateBig").textContent=parseInt(m)+"月"+parseInt(d)+"日";
+  document.getElementById("dayDateSub").textContent=y+"年（"+DOW[dow]+"）";
   const badge=document.getElementById("dayBadge");
-  if(HOLIDAYS.has(dayDate))badge.innerHTML='<span class="badge badge-hol">ð ç¥æ¥</span>';
-  else if(dow===0)badge.innerHTML='<span class="badge badge-sun">æ¥ææ¥</span>';
-  else badge.innerHTML='<span class="badge badge-sat">åææ¥</span>';
+  if(HOLIDAYS.has(dayDate))badge.innerHTML='<span class="badge badge-hol">🎌 祝日</span>';
+  else if(dow===0)badge.innerHTML='<span class="badge badge-sun">日曜日</span>';
+  else badge.innerHTML='<span class="badge badge-sat">土曜日</span>';
 
   const rec=state.records[dayDate]||{};
   const zCount=getDZC(dayDate);const zNames=getDZN(dayDate);
 
-  // ã¨ãªã¢ç·¨é
+  // エリア編集
   const zeb=document.getElementById("zoneEditBox");
   zeb.style.display=zoneEditOpen?"block":"none";
   if(zoneEditOpen){
-    let h=`<div class="zone-edit-box"><div class="lbl">ãã®æ¥ã®ã¨ãªã¢è¨­å®</div>
+    let h=`<div class="zone-edit-box"><div class="lbl">この日のエリア設定</div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-      <span style="font-size:12px;font-weight:700;color:var(--sub)">ã¨ãªã¢æ°ï¼</span>
+      <span style="font-size:12px;font-weight:700;color:var(--sub)">エリア数：</span>
       ${[1,2,3].map(n=>`<button class="zc-btn${zCount===n?" act":""}" onclick="setDayZoneCount(${n})">${n}</button>`).join("")}
     </div>`;
     for(let i=0;i<zCount;i++){
       h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span class="zdot" style="background:${ZC[i].dot}"></span>
-        <input type="text" value="${zNames[i]||'ã¨ãªã¢'+(i+1)}" style="flex:1" onchange="setDayZoneName(${i},this.value)">
+        <input type="text" value="${zNames[i]||'エリア'+(i+1)}" style="flex:1" onchange="setDayZoneName(${i},this.value)">
       </div>`;
     }
     h+="</div>";zeb.innerHTML=h;
   }
 
-  // åºæ¬ ãã¼ãã«
-  let html="<thead><tr><th>æå°è</th><th>åºæ¬ </th></tr></thead><tbody>";
+  // 出欠テーブル
+  let html="<thead><tr><th>指導者</th><th>出欠</th></tr></thead><tbody>";
   state.coaches.forEach(name=>{
     const r=rec[name]||{att:"unknown"};
-    const pill=r.att==="present"?'present">â åºå¸­':r.att==="absent"?'absent">Ã æ¬ å¸­':'unknown">ï¼ æªå¥å';
+    const pill=r.att==="present"?'present">○ 出席':r.att==="absent"?'absent">× 欠席':'unknown">？ 未入力';
     html+=`<tr><td style="font-weight:700">${name}</td><td><span class="pill ${pill}</span></td></tr>`;
   });
   document.getElementById("dayAttTbl").innerHTML=html+"</tbody>";
 
-  // éç½®ãã¼ã
+  // 配置ボード
   const board=document.getElementById("placementBoard");board.innerHTML="";
   const present=state.coaches.filter(n=>rec[n]?.att==="present");
-  if(!present.length){board.innerHTML='<div style="color:var(--gray);font-size:13px;text-align:center;padding:16px">åºå¸­èããã¾ãã</div>';return;}
+  if(!present.length){board.innerHTML='<div style="color:var(--gray);font-size:13px;text-align:center;padding:16px">出席者がいません</div>';return;}
 
   const ua=present.filter(n=>!rec[n]?.zone);
   const pool=document.createElement("div");pool.className="pool";
-  pool.innerHTML=`<div class="pool-lbl">ð¥ éç½®æªå®ï¼${ua.length}åï¼</div>`;
+  pool.innerHTML=`<div class="pool-lbl">📥 配置未定（${ua.length}名）</div>`;
   const poolChips=document.createElement("div");poolChips.className="chips";
-  if(!ua.length)poolChips.innerHTML='<span style="font-size:13px;color:var(--gray)">å¨å¡éç½®æ¸ã¿ â</span>';
+  if(!ua.length)poolChips.innerHTML='<span style="font-size:13px;color:var(--gray)">全員配置済み ✅</span>';
   else ua.forEach(n=>poolChips.appendChild(makeChip(n,0,zCount,zNames)));
   pool.appendChild(poolChips);board.appendChild(pool);
 
@@ -427,11 +427,11 @@ function renderDay(){
     area.style.cssText=`background:${c.bg};border-color:${c.border}`;
     area.innerHTML=`<div class="zone-hdr" style="background:${c.bg}">
       <span class="zdot" style="background:${c.dot}"></span>
-      <span style="font-size:15px;font-weight:800;flex:1;color:${c.text}">${zNames[z-1]||"ã¨ãªã¢"+z}</span>
-      <span style="font-size:12px;color:${c.text};opacity:.7">${assigned.length}å</span>
+      <span style="font-size:15px;font-weight:800;flex:1;color:${c.text}">${zNames[z-1]||"エリア"+z}</span>
+      <span style="font-size:12px;color:${c.text};opacity:.7">${assigned.length}名</span>
     </div>`;
     const body=document.createElement("div");body.className="zone-body";
-    if(!assigned.length)body.innerHTML=`<span style="color:${c.text};font-size:13px;opacity:.5">ããã«éç½®</span>`;
+    if(!assigned.length)body.innerHTML=`<span style="color:${c.text};font-size:13px;opacity:.5">ここに配置</span>`;
     else assigned.forEach(n=>body.appendChild(makeChip(n,z,zCount,zNames)));
     area.appendChild(body);board.appendChild(area);
   }
@@ -447,7 +447,7 @@ function makeChip(name,cz,zCount,zNames){
   chip.className="chip"+(cz===0?" chip-un":"");
   if(cz>0){const c=ZC[cz-1];chip.style.cssText=`background:${c.bg};border:2px solid ${c.border};color:${c.text}`;}
   const txt=document.createElement("span");txt.textContent=name;chip.appendChild(txt);
-  if(cz>0){const x=document.createElement("span");x.textContent="â";x.style.cssText="font-size:11px;opacity:.45;margin-left:2px";chip.appendChild(x);}
+  if(cz>0){const x=document.createElement("span");x.textContent="✕";x.style.cssText="font-size:11px;opacity:.45;margin-left:2px";chip.appendChild(x);}
   chip.onclick=e=>{e.stopPropagation();showChipMenu(e,name,cz,zCount,zNames);};
   return chip;
 }
@@ -460,12 +460,12 @@ function showChipMenu(e,name,cz,zCount,zNames){
   if(left+175>window.innerWidth)left=window.innerWidth-180;
   menu.style.cssText=`display:block;top:${top}px;left:${left}px`;
   document.getElementById("menuOverlay").style.display="block";
-  let h=`<div class="menu-title">${name} ã®éç½®å</div>`;
-  if(cz>0)h+=`<div class="menu-item" style="color:var(--gray)" onclick="assignZone('${name}',0)">ð¥ æªå®ã«æ»ã</div>`;
+  let h=`<div class="menu-title">${name} の配置先</div>`;
+  if(cz>0)h+=`<div class="menu-item" style="color:var(--gray)" onclick="assignZone('${name}',0)">📥 未定に戻す</div>`;
   for(let z=1;z<=zCount;z++){
     const c=ZC[z-1];const active=cz===z;
     h+=`<div class="menu-item" style="background:${active?c.bg:"transparent"};color:${c.text}" onclick="assignZone('${name}',${z})">
-      <span class="zdot" style="background:${c.dot}"></span>${zNames[z-1]||"ã¨ãªã¢"+z}${active?" â":""}
+      <span class="zdot" style="background:${c.dot}"></span>${zNames[z-1]||"エリア"+z}${active?" ✓":""}
     </div>`;
   }
   menu.innerHTML=h;
@@ -486,19 +486,19 @@ window.closeMenu = function(){
 window.exportDay = function(){
   const rec=state.records[dayDate]||{};const zCount=getDZC(dayDate);const zNames=getDZN(dayDate);
   const[y,m,d]=dayDate.split("-");const dow=DOW[new Date(dayDate).getDay()];
-  let txt=`ã${parseInt(m)}/${parseInt(d)}ï¼${dow}ï¼ åºæ¬ ã»éç½®ã\n\n`;
+  let txt=`【${parseInt(m)}/${parseInt(d)}（${dow}） 出欠・配置】\n\n`;
   for(let z=1;z<=zCount;z++){
     const a=state.coaches.filter(n=>rec[n]?.att==="present"&&rec[n]?.zone===z);
-    txt+=`â¼ ${zNames[z-1]||"ã¨ãªã¢"+z}ï¼${a.length}åï¼\n`;a.forEach(n=>txt+=`  ã»${n}\n`);txt+="\n";
+    txt+=`▼ ${zNames[z-1]||"エリア"+z}（${a.length}名）\n`;a.forEach(n=>txt+=`  ・${n}\n`);txt+="\n";
   }
   const ua=state.coaches.filter(n=>rec[n]?.att==="present"&&!rec[n]?.zone);
-  if(ua.length){txt+=`â¼ éç½®æªå®ï¼${ua.length}åï¼\n`;ua.forEach(n=>txt+=`  ã»${n}\n`);txt+="\n";}
+  if(ua.length){txt+=`▼ 配置未定（${ua.length}名）\n`;ua.forEach(n=>txt+=`  ・${n}\n`);txt+="\n";}
   const ab=state.coaches.filter(n=>rec[n]?.att==="absent");
-  if(ab.length){txt+=`â¼ æ¬ å¸­ï¼${ab.length}åï¼\n`;ab.forEach(n=>txt+=`  ã»${n}\n`);}
-  navigator.clipboard.writeText(txt).then(()=>showToast("ã³ãã¼ãã¾ããï¼")).catch(()=>prompt("ã³ãã¼:",txt));
+  if(ab.length){txt+=`▼ 欠席（${ab.length}名）\n`;ab.forEach(n=>txt+=`  ・${n}\n`);}
+  navigator.clipboard.writeText(txt).then(()=>showToast("コピーしました！")).catch(()=>prompt("コピー:",txt));
 };
 
-// ââ ä¸è¦§ âââââââââââââââââââââââââââââââââââââââââ
+// ── 一覧 ─────────────────────────────────────────
 window.shiftMonth = function(dir){
   ovMonth+=dir;
   if(ovMonth>12){ovMonth=1;ovYear++;}
@@ -507,23 +507,23 @@ window.shiftMonth = function(dir){
 };
 
 function renderOverview(){
-  document.getElementById("ovMonthLabel").textContent=ovYear+"å¹´"+ovMonth+"æ";
+  document.getElementById("ovMonthLabel").textContent=ovYear+"年"+ovMonth+"月";
   const dates=getMonthWH(ovYear,ovMonth);
   const tbl=document.getElementById("ovTbl");
-  let html="<thead><tr><th>æå°è</th>";
+  let html="<thead><tr><th>指導者</th>";
   dates.forEach(d=>{
     const dow=new Date(d).getDay();const dy=parseInt(d.split("-")[2]);
     const isHol=HOLIDAYS.has(d);
     const col=isHol?"#9d174d":dow===0?"#b91c1c":"#1d4ed8";
-    html+=`<th style="color:${col}">${dy}æ¥<br><span style="font-size:10px;font-weight:500">${DOW[dow]}</span></th>`;
+    html+=`<th style="color:${col}">${dy}日<br><span style="font-size:10px;font-weight:500">${DOW[dow]}</span></th>`;
   });
   html+="</tr></thead><tbody>";
   state.coaches.forEach(name=>{
     html+=`<tr><td>${name}</td>`;
     dates.forEach(d=>{
       const rec=state.records[d]||{};const zNames=getDZN(d);const r=rec[name];
-      if(!r){html+='<td style="color:#cbd5e1;font-size:13px">ï¼</td>';return;}
-      const att=r.att==="present"?"â":r.att==="absent"?"Ã":"ï¼";
+      if(!r){html+='<td style="color:#cbd5e1;font-size:13px">－</td>';return;}
+      const att=r.att==="present"?"○":r.att==="absent"?"×":"－";
       const col=r.att==="present"?"var(--green)":r.att==="absent"?"var(--red)":"var(--gray)";
       const zc=r.att==="present"&&r.zone>0?ZC[r.zone-1]:null;
       html+=`<td><span style="font-size:15px;color:${col};font-weight:800">${att}</span>`;
@@ -535,14 +535,14 @@ function renderOverview(){
   tbl.innerHTML=html+"</tbody>";
 }
 
-// ââ è¨­å® âââââââââââââââââââââââââââââââââââââââââ
+// ── 設定 ─────────────────────────────────────────
 function renderSettings(){
   const list=document.getElementById("coachList");list.innerHTML="";
   state.coaches.forEach((name,i)=>{
     const row=document.createElement("div");row.className="coach-row";
     const inp=document.createElement("input");inp.type="text";inp.value=name;
     inp.onchange=async e=>{state.coaches[i]=e.target.value;await saveToFirebase();};
-    const del=document.createElement("button");del.className="del-btn";del.textContent="â";
+    const del=document.createElement("button");del.className="del-btn";del.textContent="✕";
     del.onclick=async()=>{state.coaches.splice(i,1);await saveToFirebase();renderSettings();};
     row.append(inp,del);list.appendChild(row);
   });
@@ -551,23 +551,23 @@ function renderSettings(){
   for(let i=0;i<state.zoneCount;i++){
     const row=document.createElement("div");row.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
     const dot=document.createElement("span");dot.className="zdot";dot.style.background=ZC[i].dot;
-    const inp=document.createElement("input");inp.type="text";inp.value=state.zoneNames[i]||"ã¨ãªã¢"+(i+1);
+    const inp=document.createElement("input");inp.type="text";inp.value=state.zoneNames[i]||"エリア"+(i+1);
     inp.style.flex="1";inp.onchange=async e=>{state.zoneNames[i]=e.target.value;await saveToFirebase();};
     row.append(dot,inp);grid.appendChild(row);
   }
 }
 
-window.addCoach = async function(){state.coaches.push("æ°ããæå°è");await saveToFirebase();renderSettings();};
+window.addCoach = async function(){state.coaches.push("新しい指導者");await saveToFirebase();renderSettings();};
 window.setZoneCount = async function(n){state.zoneCount=n;await saveToFirebase();renderSettings();};
 
-// ââ ãã¼ã¹ã âââââââââââââââââââââââââââââââââââââ
+// ── トースト ─────────────────────────────────────
 function showToast(msg){
   const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),2200);
 }
 window.forceSync=forceSync;
 
-// ââ åæå ââââââââââââââââââââââââââââââââââââââââ
+// ── 初期化 ────────────────────────────────────────
 document.getElementById("entryDate").value=nearestWH(today());
 dayDate=nearestWH(today());
 renderEntry();
